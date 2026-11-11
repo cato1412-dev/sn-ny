@@ -10,7 +10,8 @@ const CONFIG = {
   // --- THÔNG TIN CƠ BẢN ---
   recipientName: "Em Bé Của Anh",      // Tên hoặc cách gọi thân mật hiển thị trên web
   nickname: "Công Chúa Nhỏ",          // Biệt danh
-  birthDate: "2026-11-15",             // Ngày sinh nhật (Định dạng: YYYY-MM-DD)
+  birthDate: "2026-11-12",             // Ngày sinh nhật (Định dạng: YYYY-MM-DD)
+  dateBadgeText: "12.11 • Happy Birthday", // Tag hiển thị góc trên cùng bên trái màn hình
   
   // --- ÂM NHẠC NỀN ---
   // Để trống "" để dùng hộp âm nhạc Music Box bài Happy Birthday tự động

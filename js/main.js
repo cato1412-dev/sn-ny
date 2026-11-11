@@ -42,10 +42,14 @@ function loadConfigData() {
 
   // Cập nhật ngày sinh trên chip nhỏ nếu có
   const dateChip = document.getElementById('current-date-chip');
-  if (dateChip && CONFIG.birthDate) {
-    const parts = CONFIG.birthDate.split('-');
-    if (parts.length === 3) {
-      dateChip.textContent = `${parts[2]}.${parts[1]} • Birthday Edition`;
+  if (dateChip) {
+    if (CONFIG.dateBadgeText) {
+      dateChip.textContent = CONFIG.dateBadgeText;
+    } else if (CONFIG.birthDate) {
+      const parts = CONFIG.birthDate.split('-');
+      if (parts.length === 3) {
+        dateChip.textContent = `${parts[2]}.${parts[1]} • Happy Birthday`;
+      }
     }
   }
 }
