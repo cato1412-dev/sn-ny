@@ -1,0 +1,11 @@
+# System & Editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+
+# Agent workspace data & temporary files
+.agents/
+__pycache__/
+*.pyc

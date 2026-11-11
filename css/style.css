@@ -1,0 +1,585 @@
+/**
+ * ========================================================
+ * ANTI-SLOP DESIGN SYSTEM (EDITORIAL & HUMAN-CRAFTED)
+ * ========================================================
+ * Triết lý thiết kế:
+ * - Loại bỏ hoàn toàn AI Slop: Không gradient tím neon, không bóng phát sáng quá đà.
+ * - Thẩm mỹ cao cấp (Editorial Luxury): Tone đêm ấm áp (Warm Obsidian), vàng nến (Candle Amber)
+ *   và giấy thủ công (Letterpress Cotton Paper).
+ * - Typography có hồn: Cormorant Garamond kết hợp Plus Jakarta Sans.
+ * - Khóa cố định 100dvh cho điện thoại, chuyển cảnh mượt mà tại chỗ, không cuộn.
+ */
+
+:root {
+  /* Bảng màu tinh tế, có chiều sâu */
+  --color-bg: #0c0b0e;
+  --color-surface: rgba(26, 24, 30, 0.75);
+  --color-surface-border: rgba(255, 255, 255, 0.08);
+  --color-amber: #d4a359;
+  --color-amber-muted: #967440;
+  --color-rose: #b84a5b;
+  --color-rose-dark: #8c3240;
+  --color-paper: #faf7f2;
+  --color-paper-border: #ede6dc;
+  --color-ink: #221f26;
+  --color-ink-muted: #645f6c;
+  --color-text: #f3efe6;
+  --color-text-muted: #a39ea8;
+
+  /* Font chữ Editorial */
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+::selection {
+  background-color: rgba(212, 163, 89, 0.3);
+  color: #ffffff;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  background-color: var(--color-bg);
+  background-image: 
+    radial-gradient(circle at 50% 20%, rgba(35, 30, 42, 0.6) 0%, transparent 70%),
+    radial-gradient(circle at 50% 80%, rgba(20, 18, 24, 0.8) 0%, transparent 80%);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  overflow: hidden; /* Cố định tuyệt đối 1 màn hình */
+  position: fixed;
+  top: 0;
+  left: 0;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Background Canvas Layer */
+#bg-canvas, #confetti-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#bg-canvas { z-index: 1; }
+#confetti-canvas { z-index: 9999; }
+
+/* --- THANH ĐẦU TRANG TINH TẾ (MINIMAL TOP BAR) --- */
+.top-bar {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  left: 0;
+  width: 100%;
+  max-width: 480px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.date-chip {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-amber-muted);
+}
+
+.sound-control-btn {
+  pointer-events: all;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--color-surface-border);
+  background: rgba(22, 20, 26, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sound-control-btn:hover {
+  color: var(--color-text);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.sound-control-btn:active {
+  transform: scale(0.92);
+}
+
+/* --- KHUNG VIEWPORT TOÀN MÀN HÌNH (NO SCROLL) --- */
+.app-viewport {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-width: 440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  padding-top: max(56px, calc(env(safe-area-inset-top) + 40px));
+  padding-bottom: max(20px, env(safe-area-inset-bottom));
+  z-index: 10;
+}
+
+/* --- CÁC CHẶNG TƯƠNG TÁC (STAGE PANELS) --- */
+.stage-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(12px) scale(0.98);
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              visibility 0.45s;
+}
+
+.stage-panel.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+
+/* --- THẺ EDITORIAL CAO CẤP (KHÔNG DÙNG GLASSMORPHISM CỦA AI SLOP) --- */
+.editorial-card {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface-border);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: clamp(24px, 5vh, 36px) clamp(20px, 5vw, 28px);
+  text-align: center;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Monogram vòng tròn tối giản */
+.monogram-wrapper {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.monogram-ring {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 1px solid var(--color-amber-muted);
+  opacity: 0.6;
+}
+
+.monogram-letter {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-style: italic;
+  color: var(--color-amber);
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-amber);
+  margin-bottom: 8px;
+}
+
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 6.8vw, 34px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--color-text);
+  line-height: 1.25;
+  margin-bottom: 12px;
+}
+
+.hero-subtitle {
+  color: var(--color-text-muted);
+  font-size: clamp(13px, 3.8vw, 14.5px);
+  line-height: 1.6;
+  max-width: 300px;
+  margin-bottom: 28px;
+  font-weight: 300;
+}
+
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(21px, 5.2vw, 27px);
+  font-weight: 400;
+  color: var(--color-text);
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+
+/* --- HỆ THỐNG NÚT BẤM (BUTTONS WITH HUMAN RESTRAINT) --- */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 280px;
+  padding: 13px 22px;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 163, 89, 0.4);
+  background: linear-gradient(180deg, #d8a860, #ba8842);
+  color: #17130b;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--color-surface-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-secondary:active {
+  transform: scale(0.97);
+}
+
+.btn-sm {
+  width: auto;
+  padding: 10px 18px;
+  font-size: 13px;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: var(--color-ink-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 6px 10px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* --- CHẶNG 2: BÁNH KEM 3D WEBGL (THREE.JS ARTISANAL CAKE) --- */
+.cake-panel-card {
+  padding-bottom: 24px;
+}
+
+.cake-3d-wrapper {
+  position: relative;
+  width: 100%;
+  height: clamp(170px, 30vh, 220px);
+  margin: 6px 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+#cake-3d-canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  cursor: grab;
+  outline: none;
+}
+
+#cake-3d-canvas:active {
+  cursor: grabbing;
+}
+
+.drag-hint-badge {
+  position: absolute;
+  bottom: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  background: rgba(22, 20, 26, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  font-size: 10.5px;
+  color: var(--color-amber-muted);
+  letter-spacing: 0.03em;
+  pointer-events: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Thanh điều khiển thổi nến */
+.action-dock {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.caption-hint {
+  font-size: 12px;
+  color: var(--color-amber);
+  opacity: 0.85;
+}
+
+.mic-active {
+  border-color: var(--color-rose) !important;
+  color: #ffccd5 !important;
+  background: rgba(184, 74, 91, 0.2) !important;
+}
+
+/* Banner sau khi thổi nến */
+.celebration-flow {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  animation: fadeIn 0.6s ease forwards;
+}
+
+.glow-tag {
+  font-family: var(--font-serif);
+  font-size: 17px;
+  font-style: italic;
+  color: var(--color-amber);
+}
+
+/* --- CHẶNG 3: BỨC THƯ TAY NẮN NÓT (LETTERPRESS STATIONERY) --- */
+.letter-sheet {
+  width: 100%;
+  max-width: 410px;
+  max-height: calc(100dvh - 80px);
+  background: var(--color-paper);
+  border: 1px solid var(--color-paper-border);
+  border-radius: 16px;
+  padding: clamp(16px, 3.2vh, 24px) clamp(16px, 4.2vw, 24px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  color: var(--color-ink);
+  position: relative;
+  overflow: hidden;
+}
+
+.letter-meta {
+  flex-shrink: 0;
+  border-bottom: 1px solid #ebd9c8;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  text-align: left;
+}
+
+.meta-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-rose-dark);
+}
+
+.letter-salutation {
+  font-family: var(--font-serif);
+  font-size: clamp(19px, 4.8vw, 23px);
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-top: 2px;
+}
+
+.letter-body {
+  font-size: clamp(12.6px, 3.2vw, 14px);
+  line-height: 1.62;
+  color: #38343f;
+  text-align: left;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+  scroll-behavior: smooth;
+}
+
+.letter-body::-webkit-scrollbar {
+  width: 3.5px;
+}
+
+.letter-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.letter-body::-webkit-scrollbar-thumb {
+  background: rgba(140, 50, 64, 0.28);
+  border-radius: 4px;
+}
+
+.letter-body p {
+  margin-bottom: 9px;
+}
+
+.letter-signature {
+  text-align: right;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 16px;
+  font-weight: 600;
+  color: #7d2a37;
+  margin-top: 12px;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+.letter-actions {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(212, 163, 89, 0.3);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+
+.letter-actions.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.btn-love-action {
+  background: linear-gradient(180deg, #c45263, #9d3847);
+  border-color: rgba(184, 74, 91, 0.4);
+  color: #fff;
+  width: 100%;
+}
+
+.btn-love-action:active {
+  transform: scale(0.97);
+}
+
+.heart-icon {
+  fill: #fff;
+}
+
+/* --- KHOẢNH KHẮC ƯỚC NGUYỆN (WISH OVERLAY TỐI GIẢN) --- */
+.wish-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  background: rgba(10, 9, 12, 0.96);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.8s ease, visibility 0.8s;
+}
+
+.wish-overlay.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+}
+
+.wish-inner {
+  text-align: center;
+  padding: 24px;
+}
+
+.wish-ember {
+  width: 8px;
+  height: 8px;
+  background: var(--color-amber);
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  box-shadow: 0 0 16px var(--color-amber);
+  animation: pulseEmber 2s infinite ease-in-out;
+}
+
+.wish-caption {
+  font-family: var(--font-serif);
+  font-size: clamp(19px, 5.2vw, 25px);
+  font-style: italic;
+  color: var(--color-amber);
+  letter-spacing: 0.02em;
+}
+
+/* UTILITY */
+.hidden {
+  display: none !important;
+}

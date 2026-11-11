@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Happy Birthday ✨</title>
+  
+  <!-- SEO & Social OpenGraph Tags -->
+  <meta name="description" content="Một món quà nhỏ dành riêng cho ngày sinh nhật của em." />
+  <meta property="og:title" content="Happy Birthday ✨" />
+  <meta property="og:description" content="Chạm vào đây để mở món quà sinh nhật dành riêng cho em." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#0e0d11" />
+
+  <!-- Google Fonts: Cormorant Garamond & Plus Jakarta Sans for Editorial Elegance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>" />
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/animations.css" />
+</head>
+<body>
+
+  <!-- 1. BẦU TRỜI SAO & BỤI VÀNG LÃNG MẠN (CANVAS ENGINE) -->
+  <canvas id="bg-canvas"></canvas>
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- 2. NÚT ÂM THANH TINH TẾ (MINIMALIST AUDIO TOGGLE) -->
+  <header class="top-bar">
+    <div class="date-chip" id="current-date-chip">Special Edition</div>
+    <button id="sound-toggle-btn" class="sound-control-btn" aria-label="Bật/Tắt âm thanh" title="Âm thanh">
+      <svg class="icon-sound-on" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+      <svg class="icon-sound-off hidden" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <line x1="23" y1="9" x2="17" y2="15"></line>
+        <line x1="17" y1="9" x2="23" y2="15"></line>
+      </svg>
+    </button>
+  </header>
+
+  <!-- 3. KHOẢNH KHẮC ƯỚC NGUYỆN (WISH OVERLAY TỐI GIẢN) -->
+  <div id="wish-overlay" class="wish-overlay">
+    <div class="wish-inner">
+      <div class="wish-ember"></div>
+      <p class="wish-caption">Nhắm mắt lại và ước một điều ước...</p>
+    </div>
+  </div>
+
+  <!-- 4. KHUNG TRÌNH CHIẾU ĐƠN MÀN HÌNH (ZERO-SCROLL VIEWPORT) -->
+  <main id="app-viewport" class="app-viewport">
+
+    <!-- CHẶNG 1: THIỆP MỜI BÍ MẬT (STAGE 1: INVITATION) -->
+    <section id="stage-intro" class="stage-panel active">
+      <div class="editorial-card">
+        <div class="monogram-wrapper">
+          <div class="monogram-ring"></div>
+          <span class="monogram-letter">H</span>
+        </div>
+
+        <h1 class="hero-title" id="intro-title">Món Quà Sinh Nhật</h1>
+        <p class="hero-subtitle" id="intro-sub">Dành cho ngày em bước sang tuổi mới với trọn vẹn bình yên và rạng rỡ.</p>
+
+        <button id="btn-start" class="btn-primary">
+          <span class="btn-text" id="start-btn-text">Bắt Đầu Buổi Tiệc</span>
+          <svg class="btn-arrow" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- CHẶNG 2: BÁNH KEM & THỔI NẾN (STAGE 2: CAKE & WISH) -->
+    <section id="stage-cake" class="stage-panel">
+      <div class="editorial-card cake-panel-card">
+        <h2 class="section-title">Tuổi Mới Thật Rạng Rỡ, <span class="recipient-name">Em</span></h2>
+
+        <!-- Bánh kem 3D WebGL thực thụ (Có thể xoay 360 độ) -->
+        <div id="cake-3d-wrapper" class="cake-3d-wrapper">
+          <canvas id="cake-3d-canvas"></canvas>
+          <div class="drag-hint-badge">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+            </svg>
+            <span>Vuốt để xoay 3D</span>
+          </div>
+        </div>
+
+        <!-- Cụm điều khiển thổi nến -->
+        <div id="cake-controls" class="action-dock">
+          <div class="button-group">
+            <button id="btn-blow-candle" class="btn-primary btn-sm">
+              <span class="btn-text">Thổi Nến</span>
+            </button>
+            <button id="btn-mic-blow" class="btn-secondary btn-sm" title="Thổi phù vào micro của bạn">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                <line x1="12" y1="19" x2="12" y2="23"></line>
+                <line x1="8" y1="23" x2="16" y2="23"></line>
+              </svg>
+              <span class="mic-label">Thổi Bằng Mic</span>
+            </button>
+          </div>
+          <p id="blow-hint" class="caption-hint">Chạm vào ngọn lửa hoặc thổi nhẹ vào micro</p>
+        </div>
+
+        <!-- Banner mở bức thư (Hiện ra sau khi nến đã tắt) -->
+        <div id="celebration-box" class="celebration-flow hidden">
+          <div class="glow-tag">Ngọn nến đã tắt, điều ước đã gửi đi</div>
+          <button id="btn-goto-letter" class="btn-primary">
+            <span class="btn-text">Đọc Bức Thư Của Anh</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHẶNG 3: BỨC THƯ TAY NẮN NÓT (STAGE 3: LETTERPRESS LETTER) -->
+    <section id="stage-letter" class="stage-panel">
+      <div class="letter-sheet">
+        <header class="letter-meta">
+          <div class="meta-tag">Gửi người anh thương</div>
+          <h3 class="letter-salutation">Thương gửi <span class="recipient-name">Em</span>,</h3>
+        </header>
+
+        <div id="typewriter-text" class="letter-body"></div>
+
+        <footer class="letter-actions">
+          <button id="btn-send-love" class="btn-primary btn-love-action">
+            <svg class="heart-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <span class="love-btn-text">Thả Tim Yêu Thương</span>
+          </button>
+          <button id="btn-back-cake" class="btn-ghost">
+            Xem lại bánh kem
+          </button>
+        </footer>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JAVASCRIPT MODULES -->
+  <script src="js/three.min.js"></script>
+  <script src="js/cake3d.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/sound.js"></script>
+  <script src="js/particles.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

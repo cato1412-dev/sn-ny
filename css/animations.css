@@ -1,0 +1,80 @@
+/**
+ * ========================================================
+ * ANIMATIONS & KEYFRAMES (Subtle & Natural Motion)
+ * ========================================================
+ */
+
+/* Ngọn lửa nến lung linh tự nhiên */
+@keyframes flicker {
+  0% {
+    transform: translateX(-50%) scale(1) rotate(-1deg);
+    opacity: 0.95;
+  }
+  25% {
+    transform: translateX(-50%) scale(1.05, 0.95) rotate(1.5deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-50%) scale(0.96, 1.04) rotate(-1.5deg);
+    opacity: 0.92;
+  }
+  75% {
+    transform: translateX(-50%) scale(1.03, 0.98) rotate(1deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-50%) scale(1) rotate(0deg);
+    opacity: 0.95;
+  }
+}
+
+/* Khói mỏng bốc lên khi tắt nến */
+@keyframes smokeRise {
+  0% {
+    opacity: 0.7;
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: translate(-60%, -20px) scale(2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-30%, -50px) scale(3.5);
+  }
+}
+
+/* Đốm than ấm áp thở nhẹ khi ước nguyện */
+@keyframes pulseEmber {
+  0%, 100% {
+    transform: scale(0.9);
+    opacity: 0.7;
+    box-shadow: 0 0 10px rgba(212, 163, 89, 0.5);
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(212, 163, 89, 0.9);
+  }
+}
+
+/* Fade in mượt mà */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
